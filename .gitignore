@@ -7,3 +7,6 @@ build/
 # Ignore compiled binaries and object files
 *.o
 *.exe
+
+#ignore readme
+README.md
