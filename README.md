@@ -1,2 +1,2 @@
 # RISC_V_SIM
-Computer architecture project: Making a RISC-V simulator in C 
+Alberts De Lony sepperate branch, do not screw this shit up
