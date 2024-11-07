@@ -1,10 +1,9 @@
 # RISC_V_SIM
-# Code of Conduct for [Your Project Name]
 
 ## C Coding Style Guidelines
 
 ### 1. **General Structure**
-- **Indentation**: Use **4 spaces** for indentation. **No tabs**.
+- **Indentation**: Use  **only tabs**.
 - **Line Length**: Keep lines **max 80 characters** long.
 - **Naming Conventions**: Use **descriptive names** for variables, functions, and types.
 
@@ -52,4 +51,6 @@ Example:
  *   The sum of the two integers.
  */
 int calculate_sum(int a, int b);
+
+
 
