@@ -6,6 +6,6 @@
 #include <stdlib.h>
 
 // Function declarations
-#define MAX 100
+#define NUM 13
 
 #endif // UTILS_H
