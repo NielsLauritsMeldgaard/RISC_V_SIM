@@ -39,8 +39,10 @@
   - Side effects or special behaviors.
 
 ### 8. **Structs, enums exc**
--**Use descriptive names for structs and enums.
--**Always** capital first letter in struct name
+-**Use descriptive names for structs and enums**.
+-**Always** capital first letter in struct name.
+
+
 Example:
 ```c
 /*
