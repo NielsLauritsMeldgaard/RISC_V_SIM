@@ -41,6 +41,27 @@
 ### 8. **Structs, enums exc**
 -**Use descriptive names for structs and enums.
 -**Always** capital first letter in struct name
+Example:
+```c
+/*
+*typedef struct {
+*    int x;
+*    int y;
+*    void (*move)(struct Point*, int, int);
+*} Point;
+*
+*void point_move(Point* p, int dx, int dy) {
+*    p->x += dx;
+*    p->y += dy;
+*}
+*
+*typedef enum {
+*    RED,
+*    GREEN,
+*    BLUE
+*} Color;
+*
+*/
 
   
 Example:
