@@ -37,6 +37,11 @@
   - Description of the function’s purpose.
   - Parameters and return values.
   - Side effects or special behaviors.
+
+### 8. **Structs, enums exc**
+-**Use descriptive names for structs and enums.
+-**Always** capital first letter in struct name
+
   
 Example:
 ```c
