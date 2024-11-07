@@ -1,0 +1,9 @@
+# Ignore VSCode settings
+.vscode/
+
+# Ignore build artifacts
+build/
+
+# Ignore compiled binaries and object files
+*.o
+*.exe
