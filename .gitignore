@@ -7,3 +7,5 @@ build/
 # Ignore compiled binaries and object files
 *.o
 *.exe
+
+README.md
