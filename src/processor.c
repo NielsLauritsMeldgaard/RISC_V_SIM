@@ -2,56 +2,67 @@
 #include "../inc/instr_handler.h"
 #include "../inc/GUI.h"
 
+void allocate_memory(Memory *memory) {
+    printf("Allocating memory\n");
+    memory->byte = (uint8_t *)malloc(MEMORY_SIZE * sizeof(uint8_t));
+    if (memory->byte == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+}
 
-void RISC_V(char *filename) {
+void RISC_V(char *filename, int step) {
     CPU cpu = { .pc = 0, .GPRs = {0} };
-    //Memory memory = { .memory = {0}, .instr_count = 0 };
+    cpu.GPRs[2] = STACK_BASE_ADDRESS;
+    cpu.GPRs[3] = BASE_GLOBAL_POINTER;
+    cpu.step = step; 
     Memory memory;
     Instruction instruction = { 0 };
 
     allocate_memory(&memory);
 
-    //int adress = &memory.memory;
-    memory.memory[DATA_BASE_ADDRESS + 1] = (int32_t)0x0a0a0a0a;
-    cpu.GPRs[5] = DATA_BASE_ADDRESS;
+    // Initialize memory and registers within valid range
+    //memory.byte[DATA_BASE_ADDRESS]      = (uint8_t)0x0a;
+    //memory.byte[DATA_BASE_ADDRESS + 1]  = (uint8_t)0x0a;
+    //memory.byte[DATA_BASE_ADDRESS + 2]  = (uint8_t)0x0a;
+    //memory.byte[DATA_BASE_ADDRESS + 3]  = (uint8_t)0x0a;
+    //cpu.GPRs[5] = DATA_BASE_ADDRESS;
 
     // Load program into memory
     load_program(filename, &memory);
+    init_terminal();
     while(cpu.pc <= (int)(memory.instr_count * 4)) {
         fetch(&cpu, &memory, &instruction);
         decode(&instruction);
         execute(&cpu, &memory, &instruction);
-        write_information(&cpu, &instruction);
+        ensure_zero_register(&cpu);
 
-        // Wait for space key press
-        int ch;
-        do {
-            ch = _getch();
-        } while (ch != ' ');
+        //CAN BE USED TO STEP THROUGH THE PROGRAM
+        if (cpu.step) {
+            write_information(&cpu, &instruction);
+            print_memory(&memory);
+            while(_getch() != ' ');
+        }
 
-        cpu.pc += 4;
+        cpu.cycles++;
 
     }
     
-    free(memory.memory);
+    free(memory.byte);
+    //free(memory.word);
 
-    return;
-}
-
-void allocate_memory(Memory *memory) {
-    memory->memory = (int *)malloc(MEMORY_SIZE * sizeof(int));
-    if (memory->memory == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        return;
-    }
     return;
 }
 
 
 void fetch(CPU *cpu, Memory *memory, Instruction *instruction) {
-    // Fetch instruction from memory
-    instruction->raw_instr = memory->memory[cpu->pc / 4];
-    //printf("Raw instruction fetched: 0x%08x\n", instruction->raw_instr);
+    // Fetch 4 consecutive bytes and combine them to form a 32-bit instruction
+    uint32_t instr = ((uint32_t)memory->byte[cpu->pc]       << 0)  |
+                     ((uint32_t)memory->byte[cpu->pc + 1]   << 8)  |
+                     ((uint32_t)memory->byte[cpu->pc + 2]   << 16) |
+                     ((uint32_t)memory->byte[cpu->pc + 3]   << 24);
+
+    instruction->raw_instr = instr;
     return;
 }
 
@@ -63,18 +74,13 @@ void load_program(const char *filename, Memory *memory) {
         return;
     }
 
-    // Read the file into memory
-    size_t instructions_read = fread(memory->memory, sizeof(uint32_t), MEMORY_SIZE, file);
+    // Read the file into memory bytewise
+    size_t bytes_read = fread(memory->byte, sizeof(uint8_t), MEMORY_SIZE, file);
     fclose(file);
     printf("Program loaded into memory\n");
-    printf("Instructions read: %zu\n", instructions_read);
-    memory->instr_count = instructions_read;
-    // printf("Instruction: 0x%08x\n", memory->instr_memory[1]);
+    memory->instr_count = bytes_read / 4;
+    printf("Instructions read: %zu\n", memory->instr_count);
 
-    //Print instructions to verify content
-    // for (int i = 0; i < (int)instructions_read; i++) {
-    //     printf("Instruction %d: 0x%08x\n", i, memory->memory[i]);
-    // }
     return;
 }
 
@@ -85,6 +91,6 @@ void decode(Instruction *instruction) {
     instruction->rs1 = (instruction->raw_instr >> 15) & 0x1F;
     instruction->rs2 = (instruction->raw_instr >> 20) & 0x1F;
     instruction->funct7 = (instruction->raw_instr >> 25) & 0x7F;
-    instruction->imm = (instruction->raw_instr >> 20);
+
     return;
 }

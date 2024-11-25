@@ -10,13 +10,19 @@
 #include "../inc/instructions.h"
 //#include "../inc/instr_handler.h"
 
-#define MEMORY_SIZE 0x0FFFFFFF // 512 MB for full addressable space
+//#define MEMORY_SIZE 0x11000000 // 512 MB for full addressable space
+#define MEMORY_SIZE 0xFFFFFFFF // 512 MB for full addressable space
 
 #define TEXT_BASE_ADDRESS 0x00000000
 
 #define DATA_BASE_ADDRESS 0x10000000
 
-#define STACK_BASE_ADDRESS 0x11000000
+#define STACK_BASE_ADDRESS 0x7FFFFFF0
+
+#define BASE_GLOBAL_POINTER 0x10000000
+
+#define FALSE 0
+#define TRUE 1
 
 
 #define PROGRAM_1 "../instruction_memory/addlarge.bin"
@@ -26,6 +32,11 @@
 #define PROGRAM_5 "../instruction_memory/I_R_types.bin"
 #define PROGRAM_6 "../instruction_memory/memory_load.bin"
 #define PROGRAM_7 "../instruction_memory/negatives_I_R.bin"
+#define PROGRAM_8 "../instruction_memory/memory_save.bin"
+#define PROGRAM_9 "../instruction_memory/la.bin"
+#define PROGRAM_10 "../instruction_memory/lui_auipc.bin"
+#define PROGRAM_11 "../instruction_memory/branching.bin"
+#define PROGRAM_12 "../instruction_memory/jumps.bin"
 
 #define R_TYPE(opcode) ((opcode) == 0x33)
 #define I_TYPE(opcode) ((opcode) == 0x13 || (opcode) == 0x3 || (opcode) == 0x23)
@@ -38,6 +49,8 @@
 typedef struct {
     int32_t pc;              // Program Counter
     int GPRs[32];         // 32 general-purpose registers
+    uint32_t cycles;        // Number of cycles
+    int step;
 } CPU;
 
 static inline void ensure_zero_register(CPU *cpu) {
@@ -45,10 +58,7 @@ static inline void ensure_zero_register(CPU *cpu) {
 }
 
 typedef struct {
-    //int instr_memory[MEMORY_SIZE];     // Simplified memory (e.g., 4 KB)
-    //int data_memory[MEMORY_SIZE];      // Simplified memory (e.g., 4 KB)
-    //int memory[MEMORY_SIZE];      // Simplified memory (e.g., 4 KB)
-    int *memory;
+    uint8_t *byte;
     size_t instr_count;             // Number of instructions in memory
 } Memory;
 
@@ -62,20 +72,24 @@ typedef enum {
 } InstructionType;
 
 typedef struct {
-    int32_t raw_instr;
+    uint32_t raw_instr;
     int32_t opcode;    // Opcode (7 bits in RISC-V)
     int32_t rd;        // Destination register (5 bits)
     int32_t funct3;    // Function3 field (3 bits)
     int32_t rs1;       // Source register 1 (5 bits)
     int32_t rs2;       // Source register 2 (5 bits, if applicable)
     int32_t funct7;    // Function7 field (7 bits, if applicable)
-    int32_t imm;        // Immediate value, if applicable
+    int32_t imm_I;     // Immediate value, if applicable
+    int32_t imm_S;     // Immediate value, if applicable
+    int32_t imm_B;     // Immediate value, if applicable
+    int32_t imm_U;     // Immediate value, if applicable
+    int32_t imm_J;     // Immediate value, if applicable
     InstructionType type;
     Instructions instr; //Actual instruction
 } Instruction;
 
 
-void RISC_V (char *filename);
+void RISC_V (char *filename, int step);
 void load_program(const char *filename, Memory *memory);
 void fetch(CPU *cpu, Memory *memory, Instruction *instruction);
 void decode(Instruction *instruction);

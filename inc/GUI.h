@@ -19,8 +19,10 @@ void draw_window (int X, int Y, int WIDTH, int HEIGHT, int COLOR_BLUE);
 void gotoxy(int x, int y);
 void set_text_color (int color_code);
 void reset_text_color ();
-void write_GRPS(CPU *cpu, Instruction *instruction);
-void write_decode(Instruction *instruction);
+void print_GRPS(CPU *cpu, Instruction *instruction);
+void print_decode(Instruction *instruction);
+void print_memory(Memory *memory);
+void init_terminal ();
 
 
 #endif // GUI_H

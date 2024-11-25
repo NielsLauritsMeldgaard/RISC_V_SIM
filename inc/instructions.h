@@ -30,6 +30,14 @@ typedef enum {
     SB,
     SH,
     SW,
+    LUI,
+    AUIPC,
+    BEQ,
+    BNE,
+    BLT,
+    BGE,
+    BLTU,
+    BGEU,
     NUM_INSTRUCTIONS
 } Instructions;
 
